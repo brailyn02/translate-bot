@@ -17,47 +17,219 @@ GEMINI_API_KEY = "AIzaSyATpBoQBYpj1TcDdRqrmks1a0JSNgXb2VA"
 # Configure Gemini with your API key
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Custom CSS for beautiful design
+# ChatGPT-like CSS styling
 st.markdown("""
 <style>
-    .main-header {
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* ChatGPT-like color scheme */
+    .stApp {
+        background-color: #212121;
+        color: #ffffff;
+    }
+    
+    /* Main container */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 48rem;
+        margin: 0 auto;
+    }
+    
+    /* Header styling */
+    .chat-header {
         text-align: center;
-        padding: 2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
+        padding: 1.5rem 0;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #404040;
     }
-    .main-header h1 {
+    
+    .chat-header h1 {
+        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 600;
         margin: 0;
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-    .main-header p {
+    
+    .chat-header p {
+        color: #8e8ea0;
+        font-size: 0.875rem;
         margin: 0.5rem 0 0 0;
-        font-size: 1.2rem;
-        opacity: 0.9;
     }
-    .chat-container {
-        max-height: 500px;
-        overflow-y: auto;
-        padding: 1rem;
-        border-radius: 10px;
-        background: #f8f9fa;
-    }
+    
+    /* Chat messages styling */
     .stChatMessage {
+        background: transparent !important;
+        border: none !important;
+        padding: 1.5rem 0 !important;
+        margin: 0 !important;
+    }
+    
+    .stChatMessage[data-testid="chat-message-user"] {
+        background: #2f2f2f !important;
+        margin: 1rem -1rem !important;
+        padding: 1.5rem 1rem !important;
+        border-radius: 0 !important;
+    }
+    
+    .stChatMessage[data-testid="chat-message-assistant"] {
+        background: #212121 !important;
+        margin: 1rem -1rem !important;
+        padding: 1.5rem 1rem !important;
+        border-radius: 0 !important;
+        border-top: 1px solid #404040;
+    }
+    
+    /* Avatar styling */
+    .stChatMessage .stAvatar {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 2px !important;
+        margin-right: 0.75rem !important;
+        margin-top: 0.125rem !important;
+    }
+    
+    .stChatMessage[data-testid="chat-message-user"] .stAvatar {
+        background: #10a37f !important;
+    }
+    
+    .stChatMessage[data-testid="chat-message-assistant"] .stAvatar {
+        background: #19c37d !important;
+    }
+    
+    /* Message content */
+    .stChatMessage .stMarkdown {
+        color: #ffffff !important;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .stChatMessage[data-testid="chat-message-user"] .stMarkdown {
+        color: #ffffff !important;
+    }
+    
+    /* Chat input styling */
+    .stChatInput {
+        border-top: 1px solid #404040 !important;
+        background: #212121 !important;
+        padding: 1rem 0 0 0 !important;
+    }
+    
+    .stChatInput textarea {
+        background: #40414f !important;
+        border: 1px solid #565869 !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+        padding: 12px 15px !important;
+        font-size: 0.875rem !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        resize: none !important;
+        box-shadow: 0 0 0 0 transparent !important;
+        max-height: 200px !important;
+    }
+    
+    .stChatInput textarea:focus {
+        border-color: #10a37f !important;
+        outline: none !important;
+        box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.3) !important;
+    }
+    
+    .stChatInput textarea::placeholder {
+        color: #8e8ea0 !important;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        background: #10a37f !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        transition: background 0.2s !important;
+    }
+    
+    .stButton > button:hover {
+        background: #0d8f6c !important;
+    }
+    
+    /* Clear button */
+    .clear-button {
+        position: fixed;
+        bottom: 120px;
+        right: 2rem;
+        z-index: 1000;
+    }
+    
+    .clear-button button {
+        background: #565869 !important;
+        color: #ffffff !important;
+        border: 1px solid #565869 !important;
+        border-radius: 6px !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.75rem !important;
+        opacity: 0.8 !important;
+    }
+    
+    .clear-button button:hover {
+        background: #6f7081 !important;
+        opacity: 1 !important;
+    }
+    
+    /* Instructions styling */
+    .stExpander {
+        background: #2f2f2f !important;
+        border: 1px solid #404040 !important;
+        border-radius: 8px !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .stExpander .streamlit-expanderHeader {
+        background: transparent !important;
+        color: #ffffff !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .stExpander .streamlit-expanderContent {
+        background: transparent !important;
+        color: #8e8ea0 !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* Example buttons */
+    .example-buttons {
         margin-bottom: 1rem;
     }
-    .stTextInput > div > div > input {
-        border-radius: 25px;
-        border: 2px solid #667eea;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
+    
+    .example-buttons .stButton > button {
+        background: #2f2f2f !important;
+        color: #8e8ea0 !important;
+        border: 1px solid #404040 !important;
+        font-size: 0.75rem !important;
+        padding: 0.375rem 0.75rem !important;
+        border-radius: 6px !important;
     }
-    .stTextInput > div > div > input:focus {
-        border-color: #764ba2;
-        box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+    
+    .example-buttons .stButton > button:hover {
+        background: #404040 !important;
+        color: #ffffff !important;
+    }
+    
+    /* Spinner */
+    .stSpinner {
+        color: #10a37f !important;
+    }
+    
+    /* Divider */
+    hr {
+        border-color: #404040 !important;
+        margin: 2rem 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -91,17 +263,19 @@ c) Extra explanation: additional related information; list other related meaning
 
 • Formatting Rules:
 
-The first section should be in both English and Arabic Languages, provide the informations in the 1st section in both english and arabic. Then translate and explain the word in English in the 2nd section. Then in the 3rd section translate and explain it in Arabic.
+The first section should be in both English and Arabic Languages, I mean provide me the informations I asked for in the 1st section in both English and Arabic. Then translate to me the word and explain it in English in the 2nd section. Then in the 3rd section translate it and explain it in Arabic.
 
-At the very end of the whole answer, ask where the user heard that phrase or word.
+If I answer, you by "Yes" or "In" provide me with an extra answer or refine your answer without repeating anything from the first answer. Only do this if you see there is something extra to add. If the first answer was already enough or correct, I mean you guessed the source that I brought the word from it correctly, keep it brief.
 
-IMPORTANT CONTEXT RULES:
-- If user responds with "Yes" or "In" + additional context, provide extra information or refine the answer without repeating anything from the first answer. Only add something if there's genuinely something extra to add based on their context.
-- If the first answer already guessed the source correctly, keep the refinement brief.
-- If user provides input without "Yes" or "In", treat it as a completely new word/phrase request.
-- If user uses "nw" it means they want a new word translation, completely separate from previous words.
-- If a phrase contains words in quotes " ", translate only the quoted word using the phrase as context.
-- If no quotes are found, translate the entire phrase.
+If I don't answer you by "Yes" or "In" and provide you with the source it means : I'll ask about another word. You should always wait "yes" or "in" to complete on your answer, but if I don't say "yes" or "in" means : I want to translate another or a new word that have no relationship at all with the first word so keep informations completely Separated even though it is the same chat.
+
+I'll use "nw" so that you know I'm asking for a new word right now and we are done with the first word, okay!
+
+If I give you a phrase I'll put the word I want to translate between " " so translate only the word between " " and use the phrase just as a the context but don't translate it. If you don't find any " " translate and explain the whole phrase.
+
+If the word is a name or doesn't have any meanings tell me whose name is this, or the story behind it or any related informations to that word.
+
+At the very end of of the whole answer, you can ask me where I heard that phrase or word.
 """
 
     def extract_quoted_word(self, text):
@@ -180,14 +354,14 @@ def main():
 
     # Header
     st.markdown('''
-    <div class="main-header">
-        <h1>🌍 Multilingual Translate & Explain</h1>
+    <div class="chat-header">
+        <h1>Multilingual Translator</h1>
         <p>Get detailed translations with cultural context and etymology</p>
     </div>
     ''', unsafe_allow_html=True)
 
-    # Instructions in main area (since no sidebar needed)
-    with st.expander("📖 How to Use This Translator", expanded=False):
+    # Instructions
+    with st.expander("📖 How to Use This Translator"):
         col1, col2 = st.columns(2)
         
         with col1:
@@ -213,36 +387,31 @@ def main():
             """)
 
     # Quick example buttons
-    st.markdown("**🧪 Quick Examples:**")
+    st.markdown('<div class="example-buttons">', unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        if st.button("📝 reluctant", use_container_width=True):
+        if st.button("reluctant", use_container_width=True):
             st.session_state.example_to_send = "reluctant"
     
     with col2:
-        if st.button('📝 "brilliant" idea', use_container_width=True):
+        if st.button('"brilliant" idea', use_container_width=True):
             st.session_state.example_to_send = 'The "brilliant" idea'
     
     with col3:
-        if st.button("📝 yes, in psychology", use_container_width=True):
+        if st.button("yes, in psychology", use_container_width=True):
             st.session_state.example_to_send = "yes, in psychology"
     
     with col4:
-        if st.button("📝 nw ambitious", use_container_width=True):
+        if st.button("nw ambitious", use_container_width=True):
             st.session_state.example_to_send = "nw ambitious"
-
-    st.divider()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Display chat messages
-    chat_container = st.container()
-    with chat_container:
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                if message["role"] == "user":
-                    st.markdown(f"**You:** {message['content']}")
-                else:
-                    st.markdown(message["content"])
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"], avatar="🙋‍♂️" if message["role"] == "user" else "🤖"):
+            st.markdown(message["content"])
 
     # Handle example button clicks
     if 'example_to_send' in st.session_state:
@@ -252,11 +421,11 @@ def main():
         # Process example
         st.session_state.messages.append({"role": "user", "content": example_msg})
         
-        with st.chat_message("user"):
-            st.markdown(f"**You:** {example_msg}")
+        with st.chat_message("user", avatar="🙋‍♂️"):
+            st.markdown(example_msg)
         
-        with st.chat_message("assistant"):
-            with st.spinner("🤔 Analyzing and translating..."):
+        with st.chat_message("assistant", avatar="🤖"):
+            with st.spinner("Analyzing and translating..."):
                 response = st.session_state.bot.get_response(example_msg)
             st.markdown(response)
         
@@ -264,31 +433,30 @@ def main():
         st.rerun()
 
     # Chat input
-    if prompt := st.chat_input("💬 Enter any word or phrase to translate and explain..."):
+    if prompt := st.chat_input("Message Multilingual Translator"):
         # Add user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         
-        with st.chat_message("user"):
-            st.markdown(f"**You:** {prompt}")
+        with st.chat_message("user", avatar="🙋‍♂️"):
+            st.markdown(prompt)
         
         # Get bot response
-        with st.chat_message("assistant"):
-            with st.spinner("🤔 Translating and analyzing..."):
+        with st.chat_message("assistant", avatar="🤖"):
+            with st.spinner("Translating and analyzing..."):
                 response = st.session_state.bot.get_response(prompt)
             st.markdown(response)
         
         st.session_state.messages.append({"role": "assistant", "content": response})
 
-    # Footer with clear button
-    st.divider()
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        if st.button("🗑️ Clear Chat History", use_container_width=True):
+    # Clear button (floating)
+    if st.session_state.messages:
+        st.markdown('<div class="clear-button">', unsafe_allow_html=True)
+        if st.button("🗑️ Clear", key="clear_chat"):
             st.session_state.messages = []
             st.session_state.last_word = None
             st.session_state.last_response = None
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
